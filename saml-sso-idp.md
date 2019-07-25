@@ -27,9 +27,9 @@ When a user uses SAML to authenticate into a 3rd party, the sign in and sign up 
 
 After the user has authenticated via the IdP, they will be able to access the SP.  If the user was redirected to the IdP via login from the SP they will be redirected back to the SP.  Otherwise if they initiate the flow at the IdP they should be sent to the same URL directly.
 
-The IdP will pass back user authentication and profile data via SAML. The 3rd party will validate the digital signature associated with the IdP to make sure the data is sent by the proper IdP. Once that is confirmed, the 3rd party will read the profile information sent. The profile information will contain at the very least a field that uniquely identifies the user. This field will be configured by the IdP as the Subject and this can be the user’s email address, guid or any other unique id. The profile data will also include other mandatory and optional fields like user’s name, email address, etc.
+The IdP will pass back user authentication and profile data via SAML. The 3rd party will validate the digital signature associated with the IdP to make sure the data is sent by the proper IdP. Once that is confirmed, the 3rd party will read the profile information sent. The profile information will contain at the very least a field that uniquely identifies the user. This field will be configured by the IdP as the SSO ID and this can be the user’s email address, guid, or User ID. The profile data will also include other mandatory and optional fields like user’s name, email address, etc.
 
-The 3rd party will then determine if the user already exists in the system using the Subject. If it is a new user, the 3rd party will use the profile data to set up their profile in the system. The user will then be sent to new user flow.
+The 3rd party will then determine if the user already exists in the system using the SSO ID. If it is a new user, the 3rd party will use the profile data to set up their profile in the system. The user will then be sent to new user flow.
 
 If the user already exists, the 3rd party will still use the profile data to update any changes to the user’s profile. It will then login the user.
 
@@ -39,19 +39,13 @@ In both cases, the user will be authenticated into the 3rd party, which will be 
 
 IdP may pass fields differently than what is expected by 3rd party. For example, the IdP may call the first name field first_name, while the 3rd party may call it firstName.
 
-This will be handled by 3rd party using field mapping. When configuring SAML, the admin will be able to set up field mapping, where they can designate first_name to map to firstName. This will ensure that the profile data is updated properly in the 3rd party.
+This will be handled by 3rd party using field mapping. When configuring SAML, the admin will be able to set up field mapping, where they can designate first_name to map to firstName. This will ensure that the profile data is updated properly in the 3rd Party.
 
 Available fields for mapping and their SAML identifiers are as follows:
 
-|Profile Field|Claim Identifier|
-|-------------|----------------|
-|First Name   |FIRST_NAME      |
-|Last Name    |LAST_NAME       |
-|Email        |EMAIL           |
-|User Id      |UserID          |
-|User Guid    |UserGuid        |
+![SAML Attributes & Claims Mappings](assets/field-mappings.png)
 
-**Note:** The value identified by the IdP for the Subject will not be included in the list of claims by default but can be passed seperately as a claim.
+**Note:** The field identified as the SSO ID will not be included in the list of claims by default but can be enabled separately as a claim.
 
 ## Change Password and Logout
 
@@ -59,7 +53,7 @@ Since the 3rd party is not the authentication authority, both Change Password an
 
 For Change Password, the 3rd party will provide verbiage that the user needs to change their password within the IdP and optionally provide links to redirect back to the IdP.  When the Change Password Urls have been implemented by PEPconnect then the 3rd party can optionally redirect the user to that endpoint. This will not affect user’s current session with the system.
 
-For Logout, the 3rd party will clear the user’s current session and then redirect the user back to PEPconnect.  Once implmented, they optionally can pass the user to the IdP provided logout URL.
+For Logout, the 3rd party will clear the user’s current session and then redirect the user back to PEPconnect.  Once implemented, they optionally can pass the user to the IdP provided logout URL.
 
 ## Profile Editing
 
@@ -75,12 +69,25 @@ For SAML to work properly, configuration is needed at both ends. The following i
 3. **Certificate:** The IdP will provide an x.509 certificate that the 3rd party will use to validate all SAML requests sent to it.
 4. **SSO Id:** The IdP will pass a unique identifier to the 3rd party in the `<saml:Subject>` block.  It is the SP's responsibility to link this to a field within the 3rd party to uniquely identify the user within their system.
 5. **Fields and Mapping:** List of fields that the IdP will send as part of the SAML Claims within the `<saml:Attribute>` nodes to be mapped to the internal fields within the 3rd party.
-6. **Change Password URL (optional):** The URL the SP can open in the case that the user wishes to change their password.  This will be provided optionally by the IdP and is optional for the SP to implement.  If it is not implemented the 3rd party should make a reasonable attempt to hide this functionality from the end user.
-7. **Logout URL (optional):** The URL the SP can open in the case that the user wishes to log out.  This will be provided optionally by the IdP and is optional for the SP to implement.  If it is not implemented the 3rd party should make a reasonable attempt to hide this functionality from the end user.
+6. **Change Password URL (Future Implementation):** The URL the SP can open in the case that the user wishes to change their password.  This will be provided optionally by the IdP and is optional for the SP to implement.  If it is not implemented the 3rd party should make a reasonable attempt to hide this functionality from the end user.
+7. **Logout URL (Future Implementation):** The URL the SP can open in the case that the user wishes to log out.  This will be provided optionally by the IdP and is optional for the SP to implement.  If it is not implemented the 3rd party should make a reasonable attempt to hide this functionality from the end user.
 
-PEPconnect will require the SP Entity ID and SP Login URL in order to begin setup of the SAML integration.  Once that information is provided and PEPconnect has been configured, a metadata file containing the IdP information will be provided to the 3rd party similar to the following example.  This metadata contains the Entity ID for PEPconnect, IdP login URLs, and the x.509 certificate to use when verifying signed requests.
+To setup the IdP connection within PEPconnect, enter the SP provided information and configure the connection as below.  All of these fields are required so be sure to get this information from the 3rd party before initial setup.  This may require them to do a partial setup on their end in order to facilitate the generation of this information.
 
-```
+* Select "Identity Provider" as the **Vendor Connection Type**.
+![Vendor Connection Type](assets/configuration-connection-type.png)
+* Enter a name to describe the 3rd party in **Vendor Name**.  This name is for informational purposes only to identify this specific connection.
+![Vendor Name](assets/configuration-vendor-name.png)
+* Enter the **Entity ID** provided to you by the 3rd party. (Typically, will be in the form of a URL).  This must be entered exactly as it is provided by the 3rd party or the systems will refuse to talk to each other.
+![Entity ID](assets/configuration-entity-id.png)
+* Enter the **ACS URL** (sometimes called the SP URL or SP Login URL) provided to you by the 3rd party.  This is the URL that PEPconnect will send the SAML request to in order to log the user into the 3rd party.
+![ACS URL](assets/configuration-acs-url.png)
+* Select the field you want to pass as the **SSO ID**.  This is what the 3rd party will store to map users in PEPconnect to users within their own system.  User ID is preferred as this is an immutable unique identifier (it never changes) but E-mail is provided as an option as well.  Be sure to include E-mail within the claims even if it's selected here as the 3rd party may not associate the SSO ID with individual profile information within their system.
+![ACS URL](assets/configuration-sso-id.png)
+
+Once you've entered this information you can provide the downloadable XML you can access from the Vendor Connections grid to the 3rd party so they can complete their setup as an SP.  An example of this XML is below.  It contains the Entity ID for PEPconnect, IdP login URLs, and the x.509 certificate.
+
+~~~
 <EntityDescriptor xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" entityID="https://pep-siemens-info.com/" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
   <IDPSSODescriptor WantAuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
     <KeyDescriptor use="signing">
@@ -109,4 +116,5 @@ yWeO0IxceXCNYAYBfV6d/p7qXcboX0/UjxdkR5IY1OKcdDtJkzFOG3GFl3ovaHFEqA==
     <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://pep-siemens-info.com/saml/idp/6400e167-6426-4851-940a-97d13703af31" />
   </IDPSSODescriptor>
 </EntityDescriptor>
-```
+~~~
+
