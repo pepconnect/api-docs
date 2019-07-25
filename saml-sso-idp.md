@@ -11,8 +11,6 @@ The IdP and the SP do not talk directly but use the browser to broker the authen
 ![SAML Authentication Flow Source](assets/saml_flow.png)
 *Source: [Okta](https://www.okta.com/integrate/documentation/saml/)*
 
-When leveraging SAML for exchanging authentication and authorization data between systems, the LMS functions as the Service Provider (SP) and the Identity Provider (IdP) is provided by the organization.
-
 To make the connection, we will use SAML 2.0 as the protocol for exchanging information between the two providers.
 
 By default, the IdP and SP will use Http POST to redirect and transmit data between each other.
@@ -21,7 +19,7 @@ By default, the IdP and SP will use Http POST to redirect and transmit data betw
 
 When a user initiates flow at the Identity Provider (IdP), the IdP redirects user to the primary Service Provider’s (SP) URL after successful authentication.
 
-When a user initiates flow at the Service Provider (SP), the SP will determine if the user has a valid session with the system. In case the session is invalid or expired, the SP will redirect user to IdP to authenticate. One of the use cases in this scenario is where user begins the flow at a URL somewhere inside the app. It would then make sense that when the user comes back to SP, they land at the same page instead of the SP’s primary URL. This is accomplished using a parameter called RelayState. The LMS will set this value before redirecting the user to IdP, and when a user is returned back after successful authentication, it will take the user to that URL.
+When a user initiates flow at the Service Provider (SP), the SP will determine if the user has a valid session with the system. In case the session is invalid or expired, the SP will redirect user to IdP to authenticate. One of the use cases in this scenario is where user begins the flow at a URL somewhere inside the app. It would then make sense that when the user comes back to SP, they land at the same page instead of the SP’s primary URL. This is accomplished using a parameter called RelayState. The 3rd party will set this value before redirecting the user to IdP, and when a user is returned back after successful authentication, it will take the user to that URL.
 
 ## Sign Up vs. Sign in Flow
 
@@ -87,7 +85,7 @@ To setup the IdP connection within PEPconnect, enter the SP provided information
 * Select the field you want to pass as the **SSO ID**.  This is what the 3rd party will store to map users in PEPconnect to users within their own system.  User ID is preferred as this is an immutable unique identifier (it never changes) but E-mail is provided as an option as well.  Be sure to include E-mail within the claims even if it's selected here as the 3rd party may not associate the SSO ID with individual profile information within their system.
 ![ACS URL](assets/configuration-sso-id.png)
 
-Once you've entered this information you can provide the downloadable XML you can access from the Vendor Connections grid to the 3rd party so they can complete their setup as an SP.  An example of this XML is below.  It contains the Entity ID for PEPconnect, IdP login URLs, and the x.509 certificate
+Once you've entered this information you can provide the downloadable XML you can access from the Vendor Connections grid to the 3rd party so they can complete their setup as an SP.  An example of this XML is below.  It contains the Entity ID for PEPconnect, IdP login URLs, and the x.509 certificate.
 
 ~~~
 <EntityDescriptor xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" entityID="https://pep-siemens-info.com/" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
