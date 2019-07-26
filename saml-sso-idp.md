@@ -1,4 +1,6 @@
-# Single Sign-On with SAML
+# Administering Single Sign-On as a Identity Provider
+
+This guide is for administrators to help guide them through the process of setting up SAML in the role of the identity Provider.
 
 Security Assertion Markup Language (SAML) is an open standard for exchanging authentication and authorization data between providers, in particular, between an Identity Provider (IdP) and a Service Provider (SP).
 
