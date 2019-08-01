@@ -1,6 +1,6 @@
 # Single Sign-On with SAML for 3rd Party Service Providers
 
-if you are a 3rd Party provider, this guide will help you with connecting to PEP with SAML.
+if you are a 3rd Party provider, this guide will help you with connecting to PEPconnect with SAML.
 
 Security Assertion Markup Language (SAML) is an open standard for exchanging authentication and authorization data between providers, in particular, between an Identity Provider (IdP) and a Service Provider (SP).
 
